@@ -1,0 +1,25 @@
+server:
+  # 端口
+  port: 8081
+
+spring:
+  datasource:
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://192.168.85.40:3306/simple-demo?serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  redis:
+    host: 192.168.85.40
+    port: 6379
+    password: 123456
+    timeout: 10s
+    lettuce:
+      pool:
+        max-active: 200
+        max-wait: -1ms
+        max-idle: 10
+        min-idle: 0
+
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+
