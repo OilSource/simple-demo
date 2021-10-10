@@ -25,21 +25,18 @@ public class RoleController extends BaseController {
 
 
     @PostMapping("add")
-//    @SaCheckLogin
     @ApiOperation(value = "添加角色")
     public ApiResult add(@RequestBody @Valid RoleSaveReq roleSaveReq) {
         return roleService.saveRole(roleSaveReq);
     }
 
     @PutMapping("update")
-//    @SaCheckLogin
     @ApiOperation(value = "更新角色")
     public ApiResult update(@RequestBody @Valid RoleSaveReq roleSaveReq) {
         return roleService.updateRole(roleSaveReq);
     }
 
     @DeleteMapping("delete/{id}")
-//    @SaCheckLogin
     @ApiOperation(value = "删除角色")
     public ApiResult delete(@PathVariable String id) {
         return roleService.deleteRoleById(id);
@@ -47,7 +44,6 @@ public class RoleController extends BaseController {
 
 
     @PostMapping("pageList")
-//    @SaCheckLogin
     @ApiOperation(value = "查询角色分页列表")
     public ApiResult pageList(@RequestBody RoleQuery roleQuery) {
         return roleService.pageList(roleQuery);
@@ -55,21 +51,18 @@ public class RoleController extends BaseController {
 
 
     @PostMapping("list")
-//    @SaCheckLogin
     @ApiOperation(value = "查询角色列表")
     public ApiResult list() {
         return roleService.listRole();
     }
 
     @PostMapping("updateState")
-//    @SaCheckLogin
     @ApiOperation(value = "更新角色状态")
     public ApiResult updateState(@RequestBody @Validated(UserValid.UpdateState.class) RoleSaveReq roleSaveReq) {
         return roleService.updateRoleState(roleSaveReq);
     }
 
     @PostMapping("authority")
-//    @SaCheckLogin
     @ApiOperation(value = "角色授权")
     public ApiResult authority(@RequestBody RoleAuthorityReq roleAuthorityReq) {
         return roleService.authority(roleAuthorityReq);

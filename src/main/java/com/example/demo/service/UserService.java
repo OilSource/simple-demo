@@ -6,6 +6,9 @@ import com.example.demo.entity.User;
 import com.example.demo.vo.req.UserLoginReq;
 import com.example.demo.vo.req.UserQuery;
 import com.example.demo.vo.req.UserSaveReq;
+import com.example.demo.vo.resp.UserInfoResp;
+
+import javax.servlet.http.HttpServletRequest;
 
 public interface UserService extends IService<User> {
     /**
@@ -20,17 +23,23 @@ public interface UserService extends IService<User> {
     /**
      * 删除用户
      */
-    ApiResult deleteUserById(String id);
+    ApiResult deleteUserById(Long id);
     /**
      * 用户登录
      */
     ApiResult doLogin(UserLoginReq userLoginReq);
+
+    ApiResult logout(HttpServletRequest request,UserLoginReq userLoginReq);
     /**
      * 用户分页
      */
     ApiResult pageList(UserQuery userQuery);
 
     ApiResult updateUserState(UserSaveReq userSaveReq);
+
+    UserInfoResp setRoleInfo(UserInfoResp userInfoResp);
+
+    UserInfoResp setMenuInfo(UserInfoResp userInfoResp);
 
 
 }

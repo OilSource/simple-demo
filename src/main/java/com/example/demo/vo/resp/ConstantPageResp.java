@@ -1,20 +1,33 @@
 package com.example.demo.vo.resp;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.Data;
 
 import java.util.Date;
+
 @Data
-public class UserPageResp {
+public class ConstantPageResp {
 
-    private Integer id;
+    private Long id;
 
     /**
-     * 用户名
+     * 常量key
      */
-    private String username;
+    private String constKey;
 
     /**
-     * 密码
+     * 常量vlaue
+     */
+    private String constValue;
+
+    /**
+     * 0无效1有效
+     */
+    private Integer constStatus;
+
+    /**
+     * 创建时间
      */
     private Date createTime;
 
@@ -33,15 +46,8 @@ public class UserPageResp {
      */
     private String updater;
 
-
     /**
-     * 状态
+     * 备注
      */
-    private Integer userState;
-
-    private Long roleId;
-
-    private String roleName;
-
     private String remark;
 }
