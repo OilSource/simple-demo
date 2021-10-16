@@ -18,12 +18,16 @@ public class UserRedis {
         redisUtil.setEx(RedisKeys.getUserTokenKeys(token), userInfoResp, 1800, TimeUnit.SECONDS);
     }
 
-    public void getTokenUser(String token, UserInfoResp userInfoResp) {
-        redisUtil.setEx(RedisKeys.getUserTokenKeys(token), userInfoResp, 1800, TimeUnit.SECONDS);
+    public UserInfoResp getTokenUser(String token) {
+        return (UserInfoResp) redisUtil.get(RedisKeys.getUserTokenKeys(token));
     }
 
     public void deleteTokenUser(String token) {
         redisUtil.delete(RedisKeys.getUserTokenKeys(token));
+    }
+
+    public void refreshTokenUser(String token) {
+        redisUtil.expire(RedisKeys.getUserTokenKeys(token),1800, TimeUnit.SECONDS);
     }
 
 }

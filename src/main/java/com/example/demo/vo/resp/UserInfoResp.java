@@ -1,5 +1,6 @@
 package com.example.demo.vo.resp;
 
+import com.example.demo.common.dto.resp.ISecurityUser;
 import com.example.demo.entity.Role;
 import com.example.demo.entity.User;
 import com.example.demo.vo.MenuNodeVO;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 @Data
-public class UserInfoResp {
+public class UserInfoResp implements ISecurityUser {
 
     private Long id;
 

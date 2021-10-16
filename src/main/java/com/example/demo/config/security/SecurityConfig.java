@@ -3,7 +3,6 @@ package com.example.demo.config.security;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ClassUtil;
 import com.example.demo.config.security.processor.SimpleProcessor;
-import com.example.demo.config.security.provider.SimpleAccountProvider;
 import com.example.demo.config.security.subject.SimpleSubjectCreator;
 import com.usthe.sureness.matcher.DefaultPathRoleMatcher;
 import com.usthe.sureness.matcher.PathTreeProvider;
@@ -12,18 +11,11 @@ import com.usthe.sureness.mgt.SurenessSecurityManager;
 import com.usthe.sureness.processor.DefaultProcessorManager;
 import com.usthe.sureness.processor.Processor;
 import com.usthe.sureness.processor.ProcessorManager;
-import com.usthe.sureness.processor.support.JwtProcessor;
 import com.usthe.sureness.processor.support.NoneProcessor;
-import com.usthe.sureness.processor.support.PasswordProcessor;
-import com.usthe.sureness.provider.SurenessAccountProvider;
 import com.usthe.sureness.provider.annotation.AnnotationPathTreeProvider;
-import com.usthe.sureness.provider.ducument.DocumentPathTreeProvider;
 import com.usthe.sureness.subject.SubjectFactory;
 import com.usthe.sureness.subject.SurenessSubjectFactory;
-import com.usthe.sureness.subject.creater.BasicSubjectServletCreator;
-import com.usthe.sureness.subject.creater.JwtSubjectServletCreator;
 import com.usthe.sureness.subject.creater.NoneSubjectServletCreator;
-import com.usthe.sureness.util.JsonWebTokenUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -40,12 +32,11 @@ import java.util.*;
 public class SecurityConfig {
 
     @Bean
-    ProcessorManager processorManager(SimpleAccountProvider accountProvider) {
+    ProcessorManager processorManager(SimpleProcessor simpleProcessor) {
         // process init
         List<Processor> processorList = new LinkedList<>();
         processorList.add(new NoneProcessor());
-        SimpleProcessor simpleProcessor = new SimpleProcessor();
-        simpleProcessor.setSimpleAccountProvider(accountProvider);
+        processorList.add(simpleProcessor);
         return new DefaultProcessorManager(processorList);
     }
 
@@ -59,15 +50,15 @@ public class SecurityConfig {
         annotationPathTreeProvider.setScanPackages(Collections.singletonList(packages));
         ResourcePatternResolver resourcePatternResolver = ResourcePatternUtils.getResourcePatternResolver(resourceLoader);
         CachingMetadataReaderFactory cachingMetadataReaderFactory = new CachingMetadataReaderFactory(resourceLoader);
-        Resource[] resources = resourcePatternResolver.getResources("classpath*:" + packages.replace(".", "/")+"/**/*.class");
+        Resource[] resources = resourcePatternResolver.getResources("classpath*:" + packages.replace(".", "/") + "/**/*.class");
         ArrayList<Class> list = new ArrayList<>();
-        for(Resource resource:resources){
+        for (Resource resource : resources) {
             MetadataReader metadataReader = cachingMetadataReaderFactory.getMetadataReader(resource);
             String className = metadataReader.getClassMetadata().getClassName();
             list.add(ClassUtil.loadClass(className));
         }
-        BeanUtil.setProperty(annotationPathTreeProvider,"isInit",true);
-        BeanUtil.setProperty(annotationPathTreeProvider,"scanClasses",list);
+        BeanUtil.setProperty(annotationPathTreeProvider, "isInit", true);
+        BeanUtil.setProperty(annotationPathTreeProvider, "scanClasses", list);
 
         DefaultPathRoleMatcher pathRoleMatcher = new DefaultPathRoleMatcher();
         pathRoleMatcher.setPathTreeProviderList(Arrays.asList(
@@ -96,7 +87,6 @@ public class SecurityConfig {
         securityManager.setProcessorManager(processorManager);
         return securityManager;
     }
-
 
 
 }

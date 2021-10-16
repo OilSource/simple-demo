@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.demo.common.dto.resp.ApiResult;
+import com.example.demo.common.dto.resp.ISecurityUser;
 import com.example.demo.entity.User;
 import com.example.demo.vo.req.UserLoginReq;
 import com.example.demo.vo.req.UserQuery;
@@ -39,7 +40,7 @@ public interface UserService extends IService<User> {
 
     UserInfoResp setRoleInfo(UserInfoResp userInfoResp);
 
-    UserInfoResp setMenuInfo(UserInfoResp userInfoResp);
+    ISecurityUser setMenuInfo(ISecurityUser iSecurityUser);
 
 
 }

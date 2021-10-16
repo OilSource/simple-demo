@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.cacheloader.LocalCacheManager;
 import com.example.demo.common.dto.resp.ApiResult;
+import com.example.demo.common.dto.resp.ISecurityUser;
 import com.example.demo.common.dto.resp.PageVO;
 import com.example.demo.constants.ComConstant;
 import com.example.demo.entity.*;
@@ -18,7 +19,6 @@ import com.example.demo.mapper.RoleMenuMapper;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.mapper.UserRoleMapper;
 import com.example.demo.redis.UserRedis;
-import com.example.demo.service.MenuService;
 import com.example.demo.service.UserService;
 import com.example.demo.utils.EncryptUtils;
 import com.example.demo.utils.MenuTreeUtils;
@@ -31,8 +31,6 @@ import com.example.demo.vo.resp.UserPageResp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -53,8 +51,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Resource
     private UserRedis userRedis;
-
-
 
 
     @Override
@@ -93,8 +89,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setRemark(userSaveReq.getRemark());
         baseMapper.updateById(user);
         List<UserRole> userRoles = userRoleMapper.selectList(new QueryWrapper<UserRole>().eq("user_id", user.getId()));
-        if(!userRoles.get(0).getRoleId().equals(userSaveReq.getRoleId())){
-            userRoleMapper.delete(new QueryWrapper<UserRole>().eq("user_id",user.getId()));
+        if (!userRoles.get(0).getRoleId().equals(userSaveReq.getRoleId())) {
+            userRoleMapper.delete(new QueryWrapper<UserRole>().eq("user_id", user.getId()));
             UserRole userRole = new UserRole();
             userRole.setUserId(user.getId());
             userRole.setRoleId(userSaveReq.getRoleId());
@@ -127,17 +123,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         userInfoResp.setUser(user);
         userInfoResp = setRoleInfo(userInfoResp);
         String token = IdUtil.simpleUUID();
-        userRedis.setTokenUser(token,userInfoResp);
+        userRedis.setTokenUser(token, userInfoResp);
         userInfoResp.setToken(EncryptUtils.encryptToken(token));
         setMenuInfo(userInfoResp);
         return ApiResult.ok("登录成功", userInfoResp);
     }
 
     @Override
-    public ApiResult logout(HttpServletRequest request,UserLoginReq userLoginReq) {
+    public ApiResult logout(HttpServletRequest request, UserLoginReq userLoginReq) {
         String token = request.getHeader(ComConstant.AUTHORIZATION_KEY);
-        token = StrUtil.isEmpty(token)?request.getParameter(ComConstant.AUTHORIZATION_KEY):token;
-        if(StrUtil.isNotEmpty(token)){
+        token = StrUtil.isEmpty(token) ? request.getParameter(ComConstant.AUTHORIZATION_KEY) : token;
+        if (StrUtil.isNotEmpty(token)) {
             userRedis.deleteTokenUser(EncryptUtils.decryptToken(token));
         }
         return ApiResult.ok("用户登出");
@@ -173,49 +169,49 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public UserInfoResp setMenuInfo(UserInfoResp userInfoResp){
-        List<Role> roles = userInfoResp.getRoles();
+    public ISecurityUser setMenuInfo(ISecurityUser iSecurityUser) {
+        List<Role> roles = iSecurityUser.getRoles();
         List<Long> roleIds = new ArrayList<>();
-        if(CollUtil.isNotEmpty(roles)){
+        if (CollUtil.isNotEmpty(roles)) {
             roles.forEach(role -> {
                 roleIds.add(role.getId());
             });
         }
-        if(CollUtil.isNotEmpty(roleIds)){
+        if (CollUtil.isNotEmpty(roleIds)) {
             Set<String> urls = new HashSet<>();
             Set<String> perms = new HashSet<>();
             List<Menu> menuList = new ArrayList<>();
             Map<Long, Menu> allMenu = LocalCacheManager.getAllMenu();
             List<RoleMenu> roleMenuList = roleMenuMapper.selectList(new QueryWrapper<RoleMenu>().in("role_id", roleIds));
-            if(CollUtil.isNotEmpty(roleMenuList)){
-                roleMenuList.forEach(item ->{
+            if (CollUtil.isNotEmpty(roleMenuList)) {
+                roleMenuList.forEach(item -> {
                     Menu menu = allMenu.get(item.getMenuId());
-                    if(Objects.nonNull(menu)){
+                    if (Objects.nonNull(menu)) {
                         menuList.add(menu);
                     }
                 });
             }
             List<MenuNodeVO> menuNodeVOS = new ArrayList<>();
-            if(CollUtil.isNotEmpty(menuList)){
-                for (Menu menu:menuList){
+            if (CollUtil.isNotEmpty(menuList)) {
+                for (Menu menu : menuList) {
                     String url = menu.getUrl();
                     String per = menu.getPerms();
-                    if(menu.getMenuType()==0 && StrUtil.isNotEmpty(url)){
+                    if (menu.getMenuType() == 0 && StrUtil.isNotEmpty(url)) {
                         urls.add(menu.getUrl());
                     }
-                    if(menu.getMenuType()==1 && StrUtil.isNotEmpty(per)){
+                    if (menu.getMenuType() == 1 && StrUtil.isNotEmpty(per)) {
                         perms.add(menu.getPerms());
                     }
                     MenuNodeVO menuNodeVO = new MenuNodeVO();
-                    BeanUtil.copyProperties(menu,menuNodeVO);
+                    BeanUtil.copyProperties(menu, menuNodeVO);
                     menuNodeVOS.add(menuNodeVO);
                 }
             }
             List<MenuNodeVO> menus = MenuTreeUtils.build(menuNodeVOS);
-            userInfoResp.setUrls(urls);
-            userInfoResp.setPerms(perms);
-            userInfoResp.setMenus(menus);
+            iSecurityUser.setUrls(urls);
+            iSecurityUser.setPerms(perms);
+            iSecurityUser.setMenus(menus);
         }
-        return userInfoResp;
+        return iSecurityUser;
     }
 }

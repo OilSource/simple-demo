@@ -1,7 +1,11 @@
 package com.example.demo.config.security.subject;
 
+import com.example.demo.vo.UserInfoVO;
 import com.usthe.sureness.subject.PrincipalMap;
 import com.usthe.sureness.subject.Subject;
+import com.usthe.sureness.subject.SubjectSum;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
@@ -14,6 +18,11 @@ public class SimpleSubject implements Subject {
     private String remoteHost;
 
     private List<String> supportRoles;
+    @Getter@Setter
+    private UserInfoVO userInfoVO;
+
+    public SimpleSubject() {
+    }
 
     public SimpleSubject(String token, String targetUri, String remoteHost) {
         this.token = token;
@@ -79,5 +88,10 @@ public class SimpleSubject implements Subject {
     @Override
     public void setSupportRoles(Object o) {
         supportRoles = (List<String>) o;
+    }
+
+    @Override
+    public SubjectSum generateSubjectSummary() {
+        return userInfoVO;
     }
 }
