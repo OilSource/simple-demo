@@ -24,7 +24,7 @@
     where u.id = ur.user_id
     and ur.role_id = r.id
     <if test="query.username != null and query.username !=''">
-      u.username = #{query.username}
+      and u.username = #{query.username}
     </if>
   </select>
 
